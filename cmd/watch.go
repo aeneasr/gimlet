@@ -21,7 +21,7 @@ import (
 	"github.com/codegangsta/envy/lib"
 	"github.com/arekkas/gimlet/lib"
 	"github.com/pborman/uuid"
-	"strings"
+	"log"
 )
 
 // watchCmd represents the watch command
@@ -33,7 +33,7 @@ is why gimlet builds the program first, and then executes the binary.
 
 Examples:
 
-- gimlet --immediate ` + "`--this-will-be-passed-down some-argument`" + `
+- gimlet --immediate "--this-will-be-passed-down some-argument"
 - gimlet --path ./src
 `,
 	Run: MainAction,
@@ -74,12 +74,12 @@ func MainAction(cmd *cobra.Command, args []string) {
 	// Bootstrap the environment
 	envy.Bootstrap()
 
-	if len(args) == 1 {
-		args = []string{strings.Replace(args[0], "`", "", -1)}
-	} else if len(args) > 1 {
+	if len(args) > 1 {
 		logger.Fatal("You can only provide zero or one arguments.")
 		return
 	}
+
+	log.Printf("%v+", args)
 
 	// Set the PORT env
 	os.Setenv("PORT", appPort)
