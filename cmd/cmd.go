@@ -3,7 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/arekkas/gin/lib"
+	"github.com/arekkas/gimlet/lib"
 	"log"
 	"os"
 	"os/signal"
