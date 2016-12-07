@@ -21,7 +21,6 @@ import (
 	"github.com/codegangsta/envy/lib"
 	"github.com/arekkas/gimlet/lib"
 	"github.com/pborman/uuid"
-	"log"
 )
 
 // watchCmd represents the watch command
@@ -78,8 +77,6 @@ func MainAction(cmd *cobra.Command, args []string) {
 		logger.Fatal("You can only provide zero or one arguments.")
 		return
 	}
-
-	log.Printf("%v+", args)
 
 	// Set the PORT env
 	os.Setenv("PORT", appPort)
