@@ -16,8 +16,8 @@ is why gimlet builds the program first, and then executes the binary.
 
 Examples:
 
-- gimlet --immediate `--this-will-be-passed-down some-argument`
-- gimlet --path ./src
+- gimlet watch --immediate `--this-will-be-passed-down some-argument`
+- gimlet watch --path ./src
 
 Usage:
   gimlet watch <command> [flags]
