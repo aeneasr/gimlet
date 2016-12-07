@@ -3,25 +3,31 @@ package gin
 import (
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strings"
 )
 
+var logger = log.New(os.Stdout, "[gin] ", 0)
+
 type Proxy struct {
-	listener net.Listener
-	proxy    *httputil.ReverseProxy
-	builder  Builder
-	runner   Runner
-	to       *url.URL
+	listener  net.Listener
+	proxy     *httputil.ReverseProxy
+	builder   Builder
+	runner    Runner
+	to        *url.URL
+	killOnErr bool
 }
 
-func NewProxy(builder Builder, runner Runner) *Proxy {
+func NewProxy(builder Builder, runner Runner, killOnErr bool) *Proxy {
 	return &Proxy{
-		builder: builder,
-		runner:  runner,
+		builder:   builder,
+		runner:    runner,
+		killOnErr: killOnErr,
 	}
 }
 
@@ -53,7 +59,14 @@ func (p *Proxy) defaultHandler(res http.ResponseWriter, req *http.Request) {
 	if len(errors) > 0 {
 		res.Write([]byte(errors))
 	} else {
-		p.runner.Run()
+		_, err := p.runner.Run()
+		if err != nil {
+			logger.Printf("Error running: %s", err)
+			if p.killOnErr {
+				logger.Println("Exiting, because kill-on-error is true")
+				os.Exit(1)
+			}
+		}
 		if strings.ToLower(req.Header.Get("Upgrade")) == "websocket" || strings.ToLower(req.Header.Get("Accept")) == "text/event-stream" {
 			proxyWebsocket(res, req, p.to)
 		} else {

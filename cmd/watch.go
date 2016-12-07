@@ -15,12 +15,12 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-	"path/filepath"
-	"os"
-	"github.com/codegangsta/envy/lib"
 	"github.com/arekkas/gimlet/lib"
+	"github.com/codegangsta/envy/lib"
 	"github.com/pborman/uuid"
+	"github.com/spf13/cobra"
+	"os"
+	"path/filepath"
 )
 
 // watchCmd represents the watch command
@@ -32,8 +32,8 @@ is why gimlet builds the program first, and then executes the binary.
 
 Examples:
 
-- gimlet --immediate "--this-will-be-passed-down some-argument"
-- gimlet --path ./src
+- gimlet watch --immediate "--this-will-be-passed-down some-argument"
+- gimlet watch --path ./src
 `,
 	Run: MainAction,
 }
@@ -85,7 +85,7 @@ func MainAction(cmd *cobra.Command, args []string) {
 	builder := gin.NewBuilder(path, id, false, os.TempDir())
 	runner := gin.NewRunner(filepath.Join(os.TempDir(), builder.Binary()), args...)
 	runner.SetWriter(os.Stdout)
-	proxy := gin.NewProxy(builder, runner)
+	proxy := gin.NewProxy(builder, runner, killOnError)
 
 	config := &gin.Config{
 		Laddr:   laddr,
@@ -96,6 +96,7 @@ func MainAction(cmd *cobra.Command, args []string) {
 	err = proxy.Run(config)
 	if err != nil {
 		logger.Fatal(err)
+		return
 	}
 
 	if laddr != "" {
