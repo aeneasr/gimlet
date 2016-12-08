@@ -36,7 +36,10 @@ func NewRunner(bin string, args ...string) Runner {
 
 func (r *runner) Run() (*exec.Cmd, error) {
 	if r.needsRefresh() {
-		r.Kill()
+		err := r.Kill()
+		if err != nil {
+			log.Print("Error killing process: ", err)
+		}
 	}
 
 	if r.command == nil || r.Exited() {
@@ -47,6 +50,7 @@ func (r *runner) Run() (*exec.Cmd, error) {
 		time.Sleep(250 * time.Millisecond)
 		return r.command, err
 	} else {
+		log.Print("Not restarting, apparently still running")
 		return r.command, nil
 	}
 
