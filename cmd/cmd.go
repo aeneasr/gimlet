@@ -60,8 +60,6 @@ func scanChanges(interval int, watchPath string, excludeDirs []string, cb scanCa
 					return filepath.SkipDir
 				}
 			}
-			logger.Printf("Path %s changed", path)
-
 			// ignore hidden files
 			if filepath.Base(path)[0] == '.' {
 				return nil
@@ -72,6 +70,8 @@ func scanChanges(interval int, watchPath string, excludeDirs []string, cb scanCa
 				startTime = time.Now()
 				return errors.New("done")
 			}
+
+			logger.Printf("Path %s changed: %v", path, info.ModTime())
 
 			return nil
 		})
