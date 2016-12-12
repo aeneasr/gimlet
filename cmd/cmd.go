@@ -66,9 +66,9 @@ func scanChanges(interval int, watchPath string, excludeDirs []string, cb scanCa
 			}
 
 			if filepath.Ext(path) == ".go" && info.ModTime().After(startTime) {
-				logger.Printf("Path changed, triggering rebuild. path=%s modTime=%v startTime=%v", path, info.ModTime(), startTime)
-				cb(path)
+				logger.Printf("Path changed, triggering rebuild. path=%s modTime=%v startTime=%v now=%v", path, info.ModTime(), startTime, time.Now())
 				startTime = time.Now()
+				cb(path)
 				return errors.New("done")
 			}
 
