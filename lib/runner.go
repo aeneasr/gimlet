@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"runtime"
 	"time"
+	"sync"
 )
 
 type Runner interface {
@@ -24,6 +25,8 @@ type runner struct {
 	command   *exec.Cmd
 	killOnError bool
 	starttime time.Time
+	wasKilled bool
+	sync.Mutex
 }
 
 func NewRunner(bin string, killOnError bool, args ...string) Runner {
@@ -68,6 +71,9 @@ func (r *runner) SetWriter(writer io.Writer) {
 
 func (r *runner) Kill() error {
 	if r.command != nil && r.command.Process != nil {
+		r.Lock()
+		r.wasKilled = true
+		r.Unlock()
 		done := make(chan error)
 		go func() {
 			r.command.Wait()
@@ -114,14 +120,17 @@ func (r *runner) runBin() error {
 	r.starttime = time.Now()
 	go func() {
 		err := r.command.Wait()
+		r.Lock()
 		if err != nil {
-			logger.Printf("Process execution failed %s", err)
+			logger.Printf("Process execution failed: %s", err)
 		}
-		if r.killOnError {
+		if !r.wasKilled && r.killOnError {
 			logger.Println("Exiting, because kill-on-error is true")
 			time.Sleep(time.Second * 5)
 			os.Exit(1)
 		}
+		r.wasKilled = false
+		r.Unlock()
 	}()
 
 	return nil
