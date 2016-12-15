@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 )
 
 var logger = log.New(os.Stdout, "[gin] ", 0)
@@ -64,6 +65,7 @@ func (p *Proxy) defaultHandler(res http.ResponseWriter, req *http.Request) {
 			logger.Printf("Error running: %s", err)
 			if p.killOnErr {
 				logger.Println("Exiting, because kill-on-error is true")
+				time.Sleep(time.Second * 5)
 				os.Exit(1)
 			}
 		}

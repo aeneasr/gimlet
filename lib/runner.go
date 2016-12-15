@@ -22,15 +22,17 @@ type runner struct {
 	args      []string
 	writer    io.Writer
 	command   *exec.Cmd
+	killOnError bool
 	starttime time.Time
 }
 
-func NewRunner(bin string, args ...string) Runner {
+func NewRunner(bin string, killOnError bool, args ...string) Runner {
 	return &runner{
 		bin:       bin,
 		args:      args,
 		writer:    ioutil.Discard,
 		starttime: time.Now(),
+		killOnError: killOnError,
 	}
 }
 
@@ -110,7 +112,17 @@ func (r *runner) runBin() error {
 	}
 
 	r.starttime = time.Now()
-	go r.command.Wait()
+	go func() {
+		err := r.command.Wait()
+		if err != nil {
+			logger.Printf("Process execution failed %s", err)
+		}
+		if r.killOnError {
+			logger.Println("Exiting, because kill-on-error is true")
+			time.Sleep(time.Second * 5)
+			os.Exit(1)
+		}
+	}()
 
 	return nil
 }

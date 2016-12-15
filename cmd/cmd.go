@@ -27,6 +27,7 @@ func build(interval int, builder gin.Builder, runner gin.Runner, logger *log.Log
 		fmt.Println(builder.Errors())
 		if killOnErr {
 			logger.Println("Exiting, because kill-on-error is true")
+			time.Sleep(time.Second * 5)
 			os.Exit(1)
 		}
 	} else {
@@ -38,6 +39,7 @@ func build(interval int, builder gin.Builder, runner gin.Runner, logger *log.Log
 				logger.Printf("An error occurred %s\n", err)
 				if killOnErr {
 					logger.Println("Exiting, because kill-on-error is true")
+					time.Sleep(time.Second * 5)
 					os.Exit(1)
 				}
 			}

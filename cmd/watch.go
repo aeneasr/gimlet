@@ -83,7 +83,7 @@ func MainAction(cmd *cobra.Command, args []string) {
 
 	var err error
 	builder := gin.NewBuilder(path, id, false, os.TempDir())
-	runner := gin.NewRunner(filepath.Join(os.TempDir(), builder.Binary()), args...)
+	runner := gin.NewRunner(filepath.Join(os.TempDir(), builder.Binary()), killOnError, args...)
 	runner.SetWriter(os.Stdout)
 	proxy := gin.NewProxy(builder, runner, killOnError)
 
